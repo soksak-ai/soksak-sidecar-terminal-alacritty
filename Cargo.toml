@@ -1,0 +1,46 @@
+# soksak-sidecar-terminal-alacritty — terminal-domain sidecar (Alacritty VT engine).
+# The core does not link this crate: it consumes the daemon's documented wire
+# (soksak-pty-proto framing, reimplemented here — browser-chromium precedent) and
+# serves terminal plugins over a rendezvous socket. The engine name lives in this
+# unit's name only; the contract soksak-spec-sidecar-terminal is engine-neutral.
+[package]
+name = "soksak-sidecar-terminal-alacritty"
+version = "0.0.1"
+edition = "2021"
+publish = false
+description = "Terminal-domain restore sidecar on the Alacritty VT engine: mirrors PTY session output into screen state (scrollback, alt-screen, private modes), serializes it into replayable paint for warm/cold restore, and checkpoints sealed plaintext through the core PTY daemon."
+
+[lib]
+name = "soksak_sidecar_terminal_alacritty"
+path = "src/lib.rs"
+
+# The survival service — subscribes to the daemon tees, checkpoints the mirrors,
+# and serves restore over the identity-home rendezvous socket. resolve_sidecar_cmd
+# stages dist/soksak-sidecar-terminal-alacritty (stage.sh).
+[[bin]]
+name = "soksak-sidecar-terminal-alacritty"
+path = "src/main.rs"
+
+[dependencies]
+# Headless mirror engine — the sole alacritty_terminal seat (isolated behind the
+# engine module). Its Apache-2.0 attribution ships in THIRD-PARTY-NOTICES.
+alacritty_terminal = "0.26"
+# Wire — the daemon speaks NDJSON + base64 payloads; this unit reimplements the
+# documented shape (proto module) rather than linking the core crate.
+serde_json = "1"
+base64 = "0.22"
+# Redirect the survival service's own stderr to a home log (dup2) — the plugin
+# spawns it over a stdio Channel that drops stderr, so checkpoint failures would
+# be invisible. Unix-only survival service; the daemon logs the same way.
+libc = "0.2"
+
+[dev-dependencies]
+# The contract and its acceptance suite: the corpus, the declared goldens, and the assertions.
+# It has no engine of its own — the standard is the declared screen state, not what any
+# implementation does. Dev-only: nothing from it ships.
+soksak-contract-terminal = { git = "https://github.com/soksak-ai/soksak-contract-terminal.git", rev = "f2713250487fd6461e3e742bc27cde25dbabb548" }
+
+# Independent workspace — separate from the core (src-tauri) workspace, the same
+# split the browser sidecar uses (a member must live under its workspace root, so
+# a sibling directory cannot join core's).
+[workspace]
