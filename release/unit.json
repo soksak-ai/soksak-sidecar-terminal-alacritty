@@ -1,0 +1,10 @@
+{
+  "id": "soksak-sidecar-terminal-alacritty",
+  "version": "0.0.3",
+  "releaseTag": "v0.0.3",
+  "repository": "https://github.com/soksak-ai/soksak-sidecar-terminal-alacritty",
+  "interface": {
+    "id": "soksak-spec-sidecar-terminal",
+    "version": "0.0.3"
+  }
+}

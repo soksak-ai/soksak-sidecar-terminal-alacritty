@@ -404,7 +404,7 @@ source = "git+https://github.com/soksak-ai/soksak-contract-terminal.git?rev=f271
 
 [[package]]
 name = "soksak-sidecar-terminal-alacritty"
-version = "0.0.2"
+version = "0.0.3"
 dependencies = [
  "alacritty_terminal",
  "base64",
