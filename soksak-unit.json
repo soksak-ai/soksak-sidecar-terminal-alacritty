@@ -1,0 +1,27 @@
+{
+  "spec": "soksak-spec-unit@0.0.1",
+  "kind": "sidecar",
+  "id": "soksak-sidecar-terminal-alacritty",
+  "version": "0.0.1",
+  "dependencies": [
+    {
+      "kind": "sidecar",
+      "id": "soksak-sidecar-pty",
+      "version": "0.0.1"
+    }
+  ],
+  "implements": [
+    {
+      "id": "soksak-spec-sidecar-terminal",
+      "version": "0.0.1"
+    }
+  ],
+  "consumes": [],
+  "entrypoints": [
+    {
+      "role": "process",
+      "name": "terminal-alacritty",
+      "path": "dist/soksak-sidecar-terminal-alacritty"
+    }
+  ]
+}
