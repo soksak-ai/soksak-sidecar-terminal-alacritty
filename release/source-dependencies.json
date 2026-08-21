@@ -13,7 +13,7 @@
     },
     {
       "repository": "soksak-ai/soksak-spec",
-      "commit": "65d114f7aa2a722b35480bdff727c73cda620265",
+      "commit": "1b0d4b11ed8bedfa4175cee32e13e637a13925c7",
       "path": "soksak-sidecars/soksak-sidecar-terminal-alacritty/.dependency/soksak-spec"
     }
   ]
