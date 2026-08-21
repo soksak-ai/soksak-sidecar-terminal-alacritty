@@ -7,11 +7,29 @@
 //! 바이너리(서비스 소켓·데몬 피어링·체크포인트 정책)는 이 라이브러리를 링크한다.
 //! 복원 픽스처 7종(tests/restore_fixtures.rs)이 엔진-중립 합격 판정이다.
 
-pub mod checkpoint;
-pub mod daemon;
 pub mod engine;
 pub mod mirror;
-pub mod proto;
-pub mod service;
 
 pub use mirror::Mirror;
+
+impl soksak_kit_sidecar_terminal::TerminalStateMirror for Mirror {
+    fn feed(&mut self, bytes: &[u8]) {
+        Mirror::feed(self, bytes);
+    }
+    fn resize(&mut self, cols: u16, rows: u16) {
+        Mirror::resize(self, cols, rows);
+    }
+    fn rehydrate(&self) -> Vec<u8> {
+        Mirror::rehydrate(self)
+    }
+    fn cold_paint(&self) -> Vec<u8> {
+        Mirror::cold_paint(self)
+    }
+    fn frame(&self) -> soksak_kit_sidecar_terminal::mirror::TerminalFrame { Mirror::frame(self) }
+    fn alt_active(&self) -> bool {
+        Mirror::alt_active(self)
+    }
+    fn suppressed_replies(&self) -> u64 {
+        Mirror::suppressed_replies(self)
+    }
+}
