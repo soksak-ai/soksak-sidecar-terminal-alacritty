@@ -10,6 +10,11 @@
       "repository": "soksak-ai/soksak-contract-terminal",
       "commit": "5185e9f43b5b7bd236beb449e3fb252d02b4732e",
       "path": "soksak-contracts/soksak-contract-terminal"
+    },
+    {
+      "repository": "soksak-ai/soksak-spec",
+      "commit": "65d114f7aa2a722b35480bdff727c73cda620265",
+      "path": "soksak-sidecars/soksak-sidecar-terminal-alacritty/.dependency/soksak-spec"
     }
   ]
 }
