@@ -29,6 +29,8 @@ for (const { target, runner } of targets) {
 }
 requireText("release-template/sidecar/build-release.mjs", "canonical release builder");
 requireText("release-template/sidecar/validate-with-spec.mjs", "canonical release validator");
+requireText("release-template/publish-canonical-release.mjs", "canonical immutable publisher");
+requireText("GH_TOKEN: ${{ steps.release-token.outputs.token }}", "GitHub CLI release token");
 for (const duplicate of ["build-release.mjs", "release-contract.mjs", "validate-with-spec.mjs"]) {
   if (fs.existsSync(path.join(root, "scripts", duplicate))) throw new Error(`local spec copy is forbidden: scripts/${duplicate}`);
 }
