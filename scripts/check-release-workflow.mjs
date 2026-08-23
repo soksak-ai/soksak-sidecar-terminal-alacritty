@@ -14,7 +14,9 @@ const requireText = (value, label) => {
 const cargo = fs.readFileSync(path.join(root, "Cargo.toml"), "utf8");
 const stage = fs.readFileSync(path.join(root, "stage.sh"), "utf8");
 if (/\bpath\s*=\s*"\.\.\//.test(cargo)) throw new Error("Cargo dependencies must not require sibling checkouts");
-requireText("ref: 2b7d7ee5855a2dbef4507da44c347ad4fd74e552", "terminal sidecar kit commit");
+requireText("ref: 901a74f6ebf8d3de6c66d75f83ea890436cd36d6", "terminal sidecar kit commit");
+requireText("scripts/install_pty_release.py", "canonical PTY sidecar installer");
+requireText("SOKSAK_PTY_SIDECAR", "installed PTY sidecar input");
 requireText("ref: cab0691a1a01fca7436ac29f6cc2850245788ea6", "terminal contract commit");
 requireText("ref: ef67d91f635524a667b8c78052358173d55bf019", "platform spec commit");
 requireText(`path: ${ownerPath}`, "owner checkout path");
@@ -43,4 +45,11 @@ for (const duplicate of ["build-release.mjs", "release-contract.mjs", "validate-
   if (fs.existsSync(path.join(root, "scripts", duplicate))) throw new Error(`local spec copy is forbidden: scripts/${duplicate}`);
 }
 if (fs.existsSync(path.join(root, "validation/spec-validator.json"))) throw new Error("local spec pin copy is forbidden");
+for (const file of ["scripts/gate.sh", "tests/pty_integration.rs", ".github/workflows/release.yml"]) {
+  const source = fs.readFileSync(path.join(root, file), "utf8");
+  for (const obsolete of ["SOKSAK_PTYD_BIN", "SOKSAK_CORE_WORKTREE", "soksak-ptyd", "vsterm-tauri"]) {
+    if (source.includes(obsolete)) throw new Error(`${file} contains obsolete PTY path ${obsolete}`);
+  }
+}
+if (fs.existsSync(path.join(root, "scripts/e2e/ptyd-integration.sh"))) throw new Error("obsolete PTY source-build harness still exists");
 console.log("release workflow contract: passed");

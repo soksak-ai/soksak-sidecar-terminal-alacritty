@@ -18,17 +18,8 @@ BENCH_OUT="${1:-}"
 echo "== $SIDECAR: conformance, tests, integration"
 cargo test --release
 
-# 예산의 상대는 **수요**이고, 수요는 실 데몬이 tee 로 배달하는 속도다(SPEC.md §14.1). 그러니
-# 예산을 판정하려면 데몬이 있어야 한다 — 없으면 판정을 건너뛰는 것이 아니라 판정이 불가능하다.
-# 실 데몬 통합 시험이 이미 쓰는 하니스가 그것을 코어에서 빌드한다.
-if [ -z "${SOKSAK_PTYD_BIN:-}" ]; then
-  CORE="${SOKSAK_CORE_WORKTREE:?SOKSAK_CORE_WORKTREE must name the product checkout when SOKSAK_PTYD_BIN is unset}"
-  echo "== 수요 측정용 데몬을 빌드한다($CORE)"
-  ( cd "$CORE/src-tauri" && cargo build --release -p soksak-ptyd )
-  TARGET_DIR="$(cd "$CORE/src-tauri" && cargo metadata --format-version 1 --no-deps \
-    | python3 -c 'import json,sys; print(json.load(sys.stdin)["target_directory"])')"
-  export SOKSAK_PTYD_BIN="$TARGET_DIR/release/soksak-ptyd"
-fi
+: "${SOKSAK_PTY_SIDECAR:?install soksak-sidecar-pty with the shared kit installer}"
+test -x "$SOKSAK_PTY_SIDECAR"
 
 echo "== $SIDECAR: performance budget (SPEC.md §14.2)"
 if [ -n "$BENCH_OUT" ]; then
