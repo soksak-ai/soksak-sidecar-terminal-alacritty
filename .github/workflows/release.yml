@@ -53,9 +53,12 @@ jobs:
           repository: soksak-ai/soksak-contract-terminal
           ref: 71f4ac714a98ad69606a54272f4b73a0b30fe7aa
           path: soksak-contracts/soksak-contract-terminal
+      - id: rust-toolchain
+        shell: bash
+        run: echo "channel=$(sed -n 's/^channel = \"\(.*\)\"/\1/p' rust-toolchain.toml)" >> "$GITHUB_OUTPUT"
       - uses: dtolnay/rust-toolchain@4be7066ada62dd38de10e7b70166bc74ed198c30
         with:
-          toolchain: "1.96.0"
+          toolchain: ${{ steps.rust-toolchain.outputs.channel }}
           targets: ${{ matrix.target }}
       - name: Install the immutable PTY sidecar test dependency
         shell: bash
