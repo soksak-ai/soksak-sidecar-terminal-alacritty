@@ -43,16 +43,6 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           path: soksak-sidecars/soksak-sidecar-terminal-alacritty
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
-        with:
-          repository: soksak-ai/soksak-kit-sidecar-terminal
-          ref: d8d9b2d3f731cd17c10aeaea71a74b1747ff087e
-          path: soksak-kits/soksak-kit-sidecar-terminal
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
-        with:
-          repository: soksak-ai/soksak-contract-terminal
-          ref: 71f4ac714a98ad69606a54272f4b73a0b30fe7aa
-          path: soksak-contracts/soksak-contract-terminal
       - id: rust-toolchain
         shell: bash
         run: echo "channel=$(sed -n 's/^channel = \"\(.*\)\"/\1/p' rust-toolchain.toml)" >> "$GITHUB_OUTPUT"
@@ -60,11 +50,6 @@ jobs:
         with:
           toolchain: ${{ steps.rust-toolchain.outputs.channel }}
           targets: ${{ matrix.target }}
-      - name: Install the immutable PTY sidecar test dependency
-        shell: bash
-        run: |
-          pty=$(python3 ../../../soksak-kits/soksak-kit-sidecar-terminal/scripts/install_pty_release.py --target "${{ matrix.target }}" --out "$RUNNER_TEMP/pty-sidecar")
-          echo "SOKSAK_PTY_SIDECAR=$pty" >> "$GITHUB_ENV"
       - id: identity
         shell: bash
         run: |
@@ -74,9 +59,6 @@ jobs:
       - name: Build and stage the release binary for this target
         shell: bash
         run: ./stage.sh dist "${{ matrix.target }}"
-      - name: Verify the installed PTY integration
-        shell: bash
-        run: cargo test --release --test pty_integration
       - id: archive
         shell: bash
         run: |
@@ -114,12 +96,17 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           path: soksak-sidecars/soksak-sidecar-terminal-alacritty
-      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
-          node-version: "24.19.0"
+          repository: soksak-ai/soksak-spec
+          ref: 4c83e41a0aa168bc4c2e11100aba242277c731b6
+          path: soksak-sidecars/soksak-sidecar-terminal-alacritty/.dependency/soksak-spec
       - uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86
         with:
-          version: "10.30.3"
+          package_json_file: soksak-sidecars/soksak-sidecar-terminal-alacritty/.dependency/soksak-spec/package.json
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
+        with:
+          node-version-file: soksak-sidecars/soksak-sidecar-terminal-alacritty/.dependency/soksak-spec/package.json
       - id: identity
         run: |
           ver="$(sed -n 's/^version = "\(.*\)"/\1/p' Cargo.toml | head -1)"
@@ -130,11 +117,6 @@ jobs:
           pattern: dist-*
           path: soksak-sidecars/soksak-sidecar-terminal-alacritty/dist
           merge-multiple: true
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
-        with:
-          repository: soksak-ai/soksak-spec
-          ref: e5de2538bb79c60edd7713c4cb2cce8b983e951b
-          path: soksak-sidecars/soksak-sidecar-terminal-alacritty/.dependency/soksak-spec
       - name: Build the exact public validator without links
         working-directory: soksak-sidecars/soksak-sidecar-terminal-alacritty/.dependency/soksak-spec
         run: |

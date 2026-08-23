@@ -15,11 +15,14 @@ const cargo = fs.readFileSync(path.join(root, "Cargo.toml"), "utf8");
 const stage = fs.readFileSync(path.join(root, "stage.sh"), "utf8");
 if (!/^edition = "2024"$/m.test(cargo)) throw new Error("Rust packages must use edition 2024");
 if (/\bpath\s*=\s*"\.\.\//.test(cargo)) throw new Error("Cargo dependencies must not require sibling checkouts");
-requireText("ref: d8d9b2d3f731cd17c10aeaea71a74b1747ff087e", "terminal sidecar kit commit");
-requireText("scripts/install_pty_release.py", "canonical PTY sidecar installer");
-requireText("SOKSAK_PTY_SIDECAR", "installed PTY sidecar input");
-requireText("ref: 71f4ac714a98ad69606a54272f4b73a0b30fe7aa", "terminal contract commit");
-requireText("ref: e5de2538bb79c60edd7713c4cb2cce8b983e951b", "platform spec commit");
+if (!cargo.includes('rev = "d8d9b2d3f731cd17c10aeaea71a74b1747ff087e"')) throw new Error("Cargo must pin the terminal sidecar kit commit");
+if (!cargo.includes('rev = "71f4ac714a98ad69606a54272f4b73a0b30fe7aa"')) throw new Error("Cargo must pin the terminal contract commit");
+requireText("ref: 4c83e41a0aa168bc4c2e11100aba242277c731b6", "platform spec commit");
+requireText("package_json_file:", "validator-owned pnpm version");
+requireText("node-version-file:", "validator-owned Node version");
+if (/path:\s+soksak-(?:kits|contracts)\//.test(workflow)) throw new Error("Cargo dependencies must not be staged as sibling repositories");
+if (/node-version:\s*["']?\d/.test(workflow)) throw new Error("release workflow must not hardcode Node");
+if (/^\s+version:\s*["']?\d/m.test(workflow) || workflow.includes('with: { version: "')) throw new Error("release workflow must not hardcode pnpm");
 requireText(`path: ${ownerPath}`, "owner checkout path");
 requireText(`working-directory: ${ownerPath}`, "owner working directory");
 requireText(`${ownerPath}/\${{ steps.archive.outputs.asset }}`, "artifact upload path");
@@ -46,7 +49,7 @@ for (const duplicate of ["build-release.mjs", "release-contract.mjs", "validate-
   if (fs.existsSync(path.join(root, "scripts", duplicate))) throw new Error(`local spec copy is forbidden: scripts/${duplicate}`);
 }
 if (fs.existsSync(path.join(root, "validation/spec-validator.json"))) throw new Error("local spec pin copy is forbidden");
-for (const file of ["scripts/gate.sh", "tests/pty_integration.rs", ".github/workflows/release.yml"]) {
+for (const file of ["scripts/gate.sh", ".github/workflows/release.yml"]) {
   const source = fs.readFileSync(path.join(root, file), "utf8");
   for (const obsolete of ["SOKSAK_PTYD_BIN", "SOKSAK_CORE_WORKTREE", "soksak-ptyd", "vsterm-tauri"]) {
     if (source.includes(obsolete)) throw new Error(`${file} contains obsolete PTY path ${obsolete}`);

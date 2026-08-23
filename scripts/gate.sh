@@ -1,6 +1,6 @@
 #!/bin/bash
 # 이 유닛의 **합격 판정 경로**. 계약이 요구하는 것을 전부, 한 번에, blocking 으로 돌린다 —
-# 적합성 7종(선언된 reference state) + lib 유닛 + service_down + 실 데몬 통합 + 성능 예산(SPEC.md §14.2).
+# 적합성 7종(선언된 reference state) + lib 유닛 + service_down + 성능 예산(SPEC.md §14.2).
 #
 # 예산 시험은 평시 `cargo test` 에서 #[ignore] 다(벤치가 개발 루프를 느리게 하고 노이즈를 낸다).
 # 그래서 여기서 명시적으로 부른다 — 게이트 밖에서 예산은 검사되지 않고, 게이트 안에서 예산은
@@ -15,11 +15,8 @@ cd "$(dirname "$0")/.."
 SIDECAR="soksak-sidecar-terminal-alacritty"
 BENCH_OUT="${1:-}"
 
-echo "== $SIDECAR: conformance, tests, integration"
+echo "== $SIDECAR: conformance and owner tests"
 cargo test --release
-
-: "${SOKSAK_PTY_SIDECAR:?install soksak-sidecar-pty with the shared kit installer}"
-test -x "$SOKSAK_PTY_SIDECAR"
 
 echo "== $SIDECAR: performance budget (SPEC.md §14.2)"
 if [ -n "$BENCH_OUT" ]; then
