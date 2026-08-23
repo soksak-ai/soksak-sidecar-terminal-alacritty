@@ -46,12 +46,12 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           repository: soksak-ai/soksak-kit-sidecar-terminal
-          ref: 901a74f6ebf8d3de6c66d75f83ea890436cd36d6
+          ref: d8d9b2d3f731cd17c10aeaea71a74b1747ff087e
           path: soksak-kits/soksak-kit-sidecar-terminal
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           repository: soksak-ai/soksak-contract-terminal
-          ref: cab0691a1a01fca7436ac29f6cc2850245788ea6
+          ref: 71f4ac714a98ad69606a54272f4b73a0b30fe7aa
           path: soksak-contracts/soksak-contract-terminal
       - uses: dtolnay/rust-toolchain@4be7066ada62dd38de10e7b70166bc74ed198c30
         with:
@@ -130,7 +130,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           repository: soksak-ai/soksak-spec
-          ref: ef67d91f635524a667b8c78052358173d55bf019
+          ref: e5de2538bb79c60edd7713c4cb2cce8b983e951b
           path: soksak-sidecars/soksak-sidecar-terminal-alacritty/.dependency/soksak-spec
       - name: Build the exact public validator without links
         working-directory: soksak-sidecars/soksak-sidecar-terminal-alacritty/.dependency/soksak-spec
