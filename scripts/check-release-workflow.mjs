@@ -15,7 +15,7 @@ const cargo = fs.readFileSync(path.join(root, "Cargo.toml"), "utf8");
 const stage = fs.readFileSync(path.join(root, "stage.sh"), "utf8");
 if (!/^edition = "2024"$/m.test(cargo)) throw new Error("Rust packages must use edition 2024");
 if (/\bpath\s*=\s*"\.\.\//.test(cargo)) throw new Error("Cargo dependencies must not require sibling checkouts");
-if (!cargo.includes('rev = "d8d9b2d3f731cd17c10aeaea71a74b1747ff087e"')) throw new Error("Cargo must pin the terminal sidecar kit commit");
+if (!cargo.includes('rev = "f2f48219bde7a981bf4dd18ee193599639c65fe5"')) throw new Error("Cargo must pin the terminal sidecar kit commit");
 if (!cargo.includes('rev = "71f4ac714a98ad69606a54272f4b73a0b30fe7aa"')) throw new Error("Cargo must pin the terminal contract commit");
 requireText("https://github.com/soksak-ai/soksak-spec/releases/download/v0.0.27/soksak-ai-plugin-spec-0.0.27.tgz", "immutable spec package");
 requireText("a3991634079056d0066de9ffc1af1bac6d65ecf1eb1c72e3619f8fb136d4c513", "spec package digest");

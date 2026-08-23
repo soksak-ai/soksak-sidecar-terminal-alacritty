@@ -604,8 +604,8 @@ dependencies = [
 
 [[package]]
 name = "soksak-kit-sidecar-terminal"
-version = "0.0.6"
-source = "git+https://github.com/soksak-ai/soksak-kit-sidecar-terminal?rev=d8d9b2d3f731cd17c10aeaea71a74b1747ff087e#d8d9b2d3f731cd17c10aeaea71a74b1747ff087e"
+version = "0.0.7"
+source = "git+https://github.com/soksak-ai/soksak-kit-sidecar-terminal?rev=f2f48219bde7a981bf4dd18ee193599639c65fe5#f2f48219bde7a981bf4dd18ee193599639c65fe5"
 dependencies = [
  "aes-gcm",
  "base64",
@@ -619,7 +619,7 @@ dependencies = [
 
 [[package]]
 name = "soksak-sidecar-terminal-alacritty"
-version = "0.0.12"
+version = "0.0.13"
 dependencies = [
  "alacritty_terminal",
  "base64",
