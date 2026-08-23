@@ -13,6 +13,7 @@ const requireText = (value, label) => {
 };
 const cargo = fs.readFileSync(path.join(root, "Cargo.toml"), "utf8");
 const stage = fs.readFileSync(path.join(root, "stage.sh"), "utf8");
+if (!/^edition = "2024"$/m.test(cargo)) throw new Error("Rust packages must use edition 2024");
 if (/\bpath\s*=\s*"\.\.\//.test(cargo)) throw new Error("Cargo dependencies must not require sibling checkouts");
 requireText("ref: 901a74f6ebf8d3de6c66d75f83ea890436cd36d6", "terminal sidecar kit commit");
 requireText("scripts/install_pty_release.py", "canonical PTY sidecar installer");
