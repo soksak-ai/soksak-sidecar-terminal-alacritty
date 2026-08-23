@@ -619,7 +619,7 @@ dependencies = [
 
 [[package]]
 name = "soksak-sidecar-terminal-alacritty"
-version = "0.0.10"
+version = "0.0.12"
 dependencies = [
  "alacritty_terminal",
  "base64",

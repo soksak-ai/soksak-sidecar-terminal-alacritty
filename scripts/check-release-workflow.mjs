@@ -17,16 +17,17 @@ if (!/^edition = "2024"$/m.test(cargo)) throw new Error("Rust packages must use 
 if (/\bpath\s*=\s*"\.\.\//.test(cargo)) throw new Error("Cargo dependencies must not require sibling checkouts");
 if (!cargo.includes('rev = "d8d9b2d3f731cd17c10aeaea71a74b1747ff087e"')) throw new Error("Cargo must pin the terminal sidecar kit commit");
 if (!cargo.includes('rev = "71f4ac714a98ad69606a54272f4b73a0b30fe7aa"')) throw new Error("Cargo must pin the terminal contract commit");
-requireText("ref: 4c83e41a0aa168bc4c2e11100aba242277c731b6", "platform spec commit");
-requireText("package_json_file:", "validator-owned pnpm version");
-requireText("node-version-file:", "validator-owned Node version");
+requireText("https://github.com/soksak-ai/soksak-spec/releases/download/v0.0.19/soksak-ai-plugin-spec-0.0.19.tgz", "immutable spec package");
+requireText("928c0e6cc12d5500bedd386c1807003bf7c3dd34eed836b4a978d8b16d9e5b7b", "spec package digest");
+requireText('node-version: "26.7.0"', "exact Node version");
+requireText("--spec-package .dependency/spec-package", "package validator input");
 if (/path:\s+soksak-(?:kits|contracts)\//.test(workflow)) throw new Error("Cargo dependencies must not be staged as sibling repositories");
-if (/node-version:\s*["']?\d/.test(workflow)) throw new Error("release workflow must not hardcode Node");
-if (/^\s+version:\s*["']?\d/m.test(workflow) || workflow.includes('with: { version: "')) throw new Error("release workflow must not hardcode pnpm");
+if (workflow.includes("repository: soksak-ai/soksak-spec")) throw new Error("release workflow must not checkout the spec source");
+if (workflow.includes("pnpm/action-setup")) throw new Error("release workflow must not rebuild the spec package");
 requireText(`path: ${ownerPath}`, "owner checkout path");
 requireText(`working-directory: ${ownerPath}`, "owner working directory");
 requireText(`${ownerPath}/\${{ steps.archive.outputs.asset }}`, "artifact upload path");
-requireText(`working-directory: ${ownerPath}/.dependency/soksak-spec`, "validator build directory");
+requireText(".dependency/spec-package/release-template/", "immutable package tools");
 for (const obsolete of ["release/source-dependencies.json", "release/dependencies.json"]) {
   if (fs.existsSync(path.join(root, obsolete))) throw new Error(`${obsolete} is obsolete`);
 }
