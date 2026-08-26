@@ -155,6 +155,8 @@ impl Engine {
                         .intersects(Flags::WIDE_CHAR_SPACER | Flags::LEADING_WIDE_CHAR_SPACER),
                     wrapline: cell.flags.contains(Flags::WRAPLINE),
                     zerowidth: cell.zerowidth().map(|z| z.to_vec()).unwrap_or_default(),
+                    // This engine does not track OSC 8; capabilities.hyperlinks stays false.
+                    link: None,
                 }
             })
             .collect()
