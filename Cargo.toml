@@ -34,7 +34,7 @@ base64 = "0.22"
 # sockets on Unix and named pipes on Windows behind one API, inserting no framing of its
 # own, so the NDJSON + length-prefixed tee protocol is byte-for-byte unchanged.
 interprocess = "2"
-soksak-kit-sidecar-terminal = { git = "https://github.com/soksak-ai/soksak-kit-sidecar-terminal", rev = "1f0e6a6d1acd8c6eaec733f76463f907fbc055c2", features = ["integration-tests"] }
+soksak-kit-sidecar-terminal = { git = "https://github.com/soksak-ai/soksak-kit-sidecar-terminal", rev = "ffc82b5c306c5e1819662d82266d4f13b784d624", features = ["integration-tests"] }
 
 # Redirect the survival service's own stderr to a home log so checkpoint failures are
 # visible (the plugin spawns it over a stdio Channel that drops stderr). The redirect is
