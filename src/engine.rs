@@ -134,6 +134,30 @@ impl Engine {
     /// 유일한 그리드 창.
     pub fn line_cells(&self, line: i32) -> Vec<GridCell> {
         let grid = self.term.grid();
+        // A line outside the grid answers a blank row. The caller's geometry
+        // can outrun the mirror's (a pane painted before its resize lands);
+        // indexing the grid there aborts the whole render thread.
+        if line >= self.rows as i32 || line < -(grid.history_size() as i32) {
+            return (0..self.cols as usize)
+                .map(|_| GridCell {
+                    ch: ' ',
+                    fg: ColorSnap::Default,
+                    bg: ColorSnap::Default,
+                    bold: false,
+                    dim: false,
+                    italic: false,
+                    underline: false,
+                    inverse: false,
+                    strikeout: false,
+                    hidden: false,
+                    wide: false,
+                    spacer: false,
+                    wrapline: false,
+                    zerowidth: Vec::new(),
+                    link: None,
+                })
+                .collect();
+        }
         let row = &grid[Line(line)];
         (0..self.cols as usize)
             .map(|col| {
