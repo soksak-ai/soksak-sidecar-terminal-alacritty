@@ -30,4 +30,11 @@ if [ -e "$out/sidecar.json" ]; then
 else
   mv "$generated" "$out/sidecar.json"
 fi
+staged_manifest=$staged_dir/sidecar.json
+if [ -e "$staged_manifest" ]; then
+  cmp -s "$out/sidecar.json" "$staged_manifest" || { echo "process manifest conflicts with staged manifest" >&2; exit 1; }
+else
+  cp "$out/sidecar.json" "$staged_dir/.sidecar.json.next.$$"
+  mv "$staged_dir/.sidecar.json.next.$$" "$staged_manifest"
+fi
 echo "SIDECAR_STAGED target=$target output=$staged"

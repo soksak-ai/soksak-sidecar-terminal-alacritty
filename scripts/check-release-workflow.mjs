@@ -25,6 +25,9 @@ if (!stage.includes("absolute candidate output")) throw new Error("stage-built d
 if (!stage.includes('staged_dir=$out/dist') || !stage.includes('staged=$staged_dir/$name$ext')) {
   throw new Error("stage-built does not place the executable at the manifest process path");
 }
+if (!stage.includes('staged_manifest=$staged_dir/sidecar.json')) {
+  throw new Error("stage-built does not place the manifest beside the development executable");
+}
 for (const { target, runner } of targets) { requireText(`target: ${target}`, "release target"); requireText(`runner: ${runner}`, "release runner"); }
 for (const match of workflow.matchAll(/^\s*-?\s*uses:\s*([^\s#]+)/gm)) if (!/^[^@\s]+@[a-f0-9]{40}$/.test(match[1])) throw new Error(`workflow action is not commit-pinned: ${match[1]}`);
 for (const obsolete of ["stage.sh", "export PATH=", "tar -czf", "SOKSAK_PTYD_BIN", "SOKSAK_CORE_WORKTREE"]) if (workflow.includes(obsolete)) throw new Error(`workflow retains obsolete behavior: ${obsolete}`);
