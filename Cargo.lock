@@ -206,7 +206,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "39cab71617ae0d63f51a36d69f866391735b51691dbda63cf6f96d042b63efeb"
 dependencies = [
  "libc",
- "windows-sys 0.59.0",
+ "windows-sys 0.61.2",
 ]
 
 [[package]]
@@ -315,9 +315,9 @@ checksum = "8f42a60cbdf9a97f5d2305f08a87dc4e09308d1276d28c869c684d7777685682"
 
 [[package]]
 name = "libc"
-version = "0.2.186"
+version = "0.2.189"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "68ab91017fe16c622486840e4c83c9a37afeff978bd239b5293d61ece587de66"
+checksum = "3eaf3ede3fee6db1a4c2ee091bf8a8b4dccdc6d17f656fb07896ee72867612f2"
 
 [[package]]
 name = "linux-raw-sys"
@@ -502,7 +502,7 @@ dependencies = [
  "errno",
  "libc",
  "linux-raw-sys",
- "windows-sys 0.59.0",
+ "windows-sys 0.61.2",
 ]
 
 [[package]]
@@ -610,8 +610,8 @@ checksum = "8ed6a63f02c8539c91a8685a86f4099661ba3da017932f6ebbea6de3f0fa7c90"
 
 [[package]]
 name = "soksak-contract-control"
-version = "0.0.2"
-source = "git+https://github.com/soksak-ai/soksak-contract-control?rev=9c04b11819a7bee521368ad446ac196a5370d071#9c04b11819a7bee521368ad446ac196a5370d071"
+version = "0.0.3"
+source = "git+https://github.com/soksak-ai/soksak-contract-control?rev=44c52e0e5436366da9185d74bac11abb4c426946#44c52e0e5436366da9185d74bac11abb4c426946"
 dependencies = [
  "serde",
  "sha2",
@@ -634,13 +634,14 @@ dependencies = [
 [[package]]
 name = "soksak-kit-sidecar-terminal"
 version = "0.0.17"
-source = "git+https://github.com/soksak-ai/soksak-kit-sidecar-terminal?rev=07c5ea045e29df2b1f2452927ad70d8bd221fcb3#07c5ea045e29df2b1f2452927ad70d8bd221fcb3"
+source = "git+https://github.com/soksak-ai/soksak-kit-sidecar-terminal?rev=0c528befb38af47872edd905ce54659568ba5862#0c528befb38af47872edd905ce54659568ba5862"
 dependencies = [
  "aes-gcm",
  "base64",
  "cc",
  "getrandom 0.3.4",
  "interprocess",
+ "libc",
  "serde",
  "serde_json",
  "sha2",
@@ -650,7 +651,7 @@ dependencies = [
 
 [[package]]
 name = "soksak-sidecar-terminal-alacritty"
-version = "0.0.24"
+version = "0.0.25"
 dependencies = [
  "alacritty_terminal",
  "base64",
