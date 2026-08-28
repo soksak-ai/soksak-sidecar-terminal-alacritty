@@ -10,6 +10,8 @@ matrix. Shared recovery, checkpoint and render-session behavior comes from the e
 ```sh
 make lock TARGET=aarch64-apple-darwin
 make verify TARGET=aarch64-apple-darwin
+make stage TARGET=aarch64-apple-darwin STAGE=dist
+make attest TARGET=aarch64-apple-darwin OUT=/absolute/alacritty-release
 ```
 
 `make lock` is the only owner operation that projects changed Cargo declarations into
