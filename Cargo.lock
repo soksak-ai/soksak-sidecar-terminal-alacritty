@@ -633,7 +633,7 @@ dependencies = [
 [[package]]
 name = "soksak-kit-sidecar-terminal"
 version = "0.0.14"
-source = "git+https://github.com/soksak-ai/soksak-kit-sidecar-terminal?rev=3ce40e3972720f130b4e3e479a2124bdd9e49e58#3ce40e3972720f130b4e3e479a2124bdd9e49e58"
+source = "git+https://github.com/soksak-ai/soksak-kit-sidecar-terminal?rev=a761d0f3fde63aab8ce5e64ac7b3f39c201c0d78#a761d0f3fde63aab8ce5e64ac7b3f39c201c0d78"
 dependencies = [
  "aes-gcm",
  "base64",
