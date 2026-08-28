@@ -13,15 +13,19 @@ use alacritty_terminal::index::{Column, Line};
 use alacritty_terminal::term::cell::Flags;
 use alacritty_terminal::term::test::TermSize;
 use alacritty_terminal::term::{Config, Term, TermMode};
-use alacritty_terminal::vte::ansi::{Color, NamedColor, Processor};
+use alacritty_terminal::vte::ansi::{
+    Color, CursorShape as AlacrittyCursorShape, NamedColor, Processor,
+};
 use soksak_kit_sidecar_terminal::mirror::TerminalEngine;
 pub use soksak_kit_sidecar_terminal::mirror::{
-    TerminalCell as GridCell, TerminalColor as ColorSnap, TerminalModes as ModeSnap,
+    TerminalCell as GridCell, TerminalColor as ColorSnap, TerminalCursorAnimation,
+    TerminalCursorShape, TerminalCursorStyle, TerminalModes as ModeSnap,
 };
 
 /// 엔진이 유지하는 스크롤백 행 수. 바이트 충실 복원의 바닥 — 전체 의미 이력은
 /// command_blocks(app.data)가 소유하고, 이 수치는 화면 재현용 창이다.
 pub const MIRROR_SCROLLBACK_LINES: usize = 1000;
+pub const CURSOR_BLINK_INTERVAL_MS: u32 = 750;
 
 // ── 이벤트 프록시 — 터미널이 PTY 에 쓰려는 응답을 포획한다 ─────────────────────
 
@@ -103,6 +107,27 @@ impl Engine {
     pub fn cursor(&self) -> (usize, usize) {
         let p = self.term.grid().cursor.point;
         (p.line.0.max(0) as usize, p.column.0)
+    }
+
+    pub fn cursor_style(&self) -> TerminalCursorStyle {
+        let style = self.term.cursor_style();
+        let shape = match style.shape {
+            AlacrittyCursorShape::Block
+            | AlacrittyCursorShape::HollowBlock
+            | AlacrittyCursorShape::Hidden => TerminalCursorShape::Block,
+            AlacrittyCursorShape::Underline => TerminalCursorShape::Underline,
+            AlacrittyCursorShape::Beam => TerminalCursorShape::Bar,
+        };
+        TerminalCursorStyle {
+            shape,
+            blinking: style.blinking,
+        }
+    }
+
+    pub fn cursor_animation(&self) -> TerminalCursorAnimation {
+        TerminalCursorAnimation {
+            interval_ms: CURSOR_BLINK_INTERVAL_MS,
+        }
     }
 
     /// 현재 스크롤백(화면 위로 밀려난) 행 수.
@@ -219,6 +244,12 @@ impl TerminalEngine for Engine {
     }
     fn cursor(&self) -> (usize, usize) {
         Engine::cursor(self)
+    }
+    fn cursor_style(&self) -> TerminalCursorStyle {
+        Engine::cursor_style(self)
+    }
+    fn cursor_animation(&self) -> TerminalCursorAnimation {
+        Engine::cursor_animation(self)
     }
     fn alt_active(&self) -> bool {
         Engine::alt_active(self)
