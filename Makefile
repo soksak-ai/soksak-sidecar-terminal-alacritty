@@ -47,15 +47,16 @@ require-out:
 
 release: require-tooling require-out verify
 	@test -z "$$(git status --porcelain)" || { echo 'release source checkout must be clean' >&2; exit 65; }
-	@tool="$$(command -v soksak-sdk)"; tooling_root="$$(cd "$$(dirname "$$tool")/.." && pwd -P)"; \
-		work="$$(mktemp -d)"; trap 'rm -rf "$$work"' EXIT HUP INT TERM; \
+	@set -eu; tool="$$(command -v soksak-sdk)"; tooling_root="$$(cd "$$(dirname "$$tool")/.." && pwd -P)"; \
+		temp_root="$$(node -e 'const {realpathSync}=require("node:fs");const {tmpdir}=require("node:os");process.stdout.write(realpathSync(tmpdir()))')"; \
+		work="$$(mktemp -d "$$temp_root/soksak-sidecar-release.XXXXXX")"; trap 'rm -rf "$$work"' EXIT HUP INT TERM; \
 		stage="$$work/stage"; package="$$work/package"; artifacts="$$work/artifacts"; \
 		mkdir -p "$$stage" "$$package/dist" "$$artifacts"; \
 		scripts/stage-built.sh "$$stage" '$(TARGET)'; \
 		cp "$$stage/sidecar.json" "$$package/sidecar.json"; \
 		cp LICENSE THIRD-PARTY-NOTICES "$$package/"; \
 		cp "$$stage/dist/soksak-sidecar-terminal-alacritty"* "$$package/dist/"; \
-		version="$$(node -e 'process.stdout.write(require(process.argv[1]).version)' sidecar.json)"; \
+		version="$$(node -e 'const {readFileSync}=require("node:fs");process.stdout.write(JSON.parse(readFileSync(process.argv[1],"utf8")).version)' "$(CURDIR)/sidecar.json")"; \
 		archive="$$artifacts/soksak-sidecar-terminal-alacritty-$$version-$(TARGET).tar.gz"; \
 		soksak-sdk pack-target --root "$(CURDIR)" --spec-root "$$tooling_root/.dependencies/soksak-spec" --target '$(TARGET)' --source "$$package" --out "$$archive"; \
 		soksak-sdk package --root "$(CURDIR)" --spec-root "$$tooling_root/.dependencies/soksak-spec" --commit "$$(git rev-parse --verify HEAD)" --artifacts "$$artifacts" --target '$(TARGET)' --out "$(OUT)"

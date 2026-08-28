@@ -16,6 +16,7 @@ if (!/^lock: preflight$/m.test(makefile) || !makefile.includes("cargo metadata -
 if (!read("README.md").includes("make lock TARGET=")) throw new Error("README must document the owner lock target");
 if (!/^STAGE \?= dist$/m.test(makefile) || /^OUT \?= dist$/m.test(makefile)) throw new Error("Makefile must separate STAGE from release OUT");
 for (const value of ["command -v soksak-sdk", "SDK_VERSION", "soksak-sdk pack-target", "soksak-sdk package", "soksak-sdk attest"]) if (!makefile.includes(value)) throw new Error(`Makefile release boundary is missing: ${value}`);
+for (const value of ["set -eu", "realpathSync(tmpdir())", "$(CURDIR)/sidecar.json"]) if (!makefile.includes(value)) throw new Error(`Makefile release transaction is missing: ${value}`);
 if (!read("README.md").includes("make attest TARGET=") || !read("README.md").includes("OUT=/absolute/")) throw new Error("README must document owner attestation");
 if (!/^benchmark:/m.test(makefile) || /--test bench/.test(stage)) throw new Error("benchmark ownership is not separated from verification");
 if (/--test bench|performance budget/.test(read("scripts/gate.sh"))) throw new Error("owner verify still executes the product benchmark");
