@@ -19,7 +19,8 @@ use alacritty_terminal::vte::ansi::{
 use soksak_kit_sidecar_terminal::mirror::TerminalEngine;
 pub use soksak_kit_sidecar_terminal::mirror::{
     TerminalCell as GridCell, TerminalColor as ColorSnap, TerminalCursorAnimation,
-    TerminalCursorShape, TerminalCursorStyle, TerminalModes as ModeSnap,
+    TerminalCursorShape, TerminalCursorStyle, TerminalModes as ModeSnap, TerminalRgb,
+    TerminalThemeOverrides,
 };
 
 /// 엔진이 유지하는 스크롤백 행 수. 바이트 충실 복원의 바닥 — 전체 의미 이력은
@@ -128,6 +129,21 @@ impl Engine {
         TerminalCursorAnimation {
             interval_ms: CURSOR_BLINK_INTERVAL_MS,
         }
+    }
+
+    pub fn theme_overrides(&self) -> TerminalThemeOverrides {
+        let colors = self.term.colors();
+        let rgb = |value: Option<alacritty_terminal::vte::ansi::Rgb>| {
+            value.map(|value| TerminalRgb { r: value.r, g: value.g, b: value.b })
+        };
+        let mut overrides = TerminalThemeOverrides::default();
+        overrides.foreground = rgb(colors[NamedColor::Foreground]);
+        overrides.background = rgb(colors[NamedColor::Background]);
+        overrides.cursor = rgb(colors[NamedColor::Cursor]);
+        for (index, slot) in overrides.ansi.iter_mut().enumerate() {
+            *slot = rgb(colors[index]);
+        }
+        overrides
     }
 
     /// 현재 스크롤백(화면 위로 밀려난) 행 수.
@@ -250,6 +266,9 @@ impl TerminalEngine for Engine {
     }
     fn cursor_animation(&self) -> TerminalCursorAnimation {
         Engine::cursor_animation(self)
+    }
+    fn theme_overrides(&self) -> TerminalThemeOverrides {
+        Engine::theme_overrides(self)
     }
     fn alt_active(&self) -> bool {
         Engine::alt_active(self)
