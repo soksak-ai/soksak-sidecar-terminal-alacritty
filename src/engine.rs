@@ -267,3 +267,27 @@ impl TerminalEngine for Engine {
         self.captured_replies().len() as u64
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use soksak_kit_sidecar_terminal::mirror::TerminalRgb;
+
+    #[test]
+    fn engine_exposes_osc_palette_and_dynamic_color_state() {
+        let mut engine = Engine::new(4, 2);
+        engine.feed(
+            b"\x1b]4;1;#123456\x07\x1b]10;#abcdef\x07\x1b]11;#223344\x07\x1b]12;#654321\x07",
+        );
+        let colors = TerminalEngine::theme_overrides(&engine);
+        assert_eq!(colors.ansi[1], Some(TerminalRgb { r: 0x12, g: 0x34, b: 0x56 }));
+        assert_eq!(colors.foreground, Some(TerminalRgb { r: 0xab, g: 0xcd, b: 0xef }));
+        assert_eq!(colors.background, Some(TerminalRgb { r: 0x22, g: 0x33, b: 0x44 }));
+        assert_eq!(colors.cursor, Some(TerminalRgb { r: 0x65, g: 0x43, b: 0x21 }));
+
+        engine.feed(b"\x1b]104;1\x07\x1b]110\x07\x1b]111\x07\x1b]112\x07");
+        let reset = TerminalEngine::theme_overrides(&engine);
+        assert_eq!(reset.ansi[1], None);
+        assert_eq!((reset.foreground, reset.background, reset.cursor), (None, None, None));
+    }
+}
