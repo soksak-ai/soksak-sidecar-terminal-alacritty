@@ -10,22 +10,24 @@ name=soksak-sidecar-terminal-alacritty
 case "$target" in *windows*) ext=.exe ;; *) ext= ;; esac
 source=target/$target/release/$name$ext
 [ -f "$source" ] || { echo "release binary is missing: $source" >&2; exit 1; }
-mkdir -p "$out"
+staged_dir=$out/dist
+mkdir -p "$staged_dir"
 [ ! -L "$out" ] || { echo 'stage output must not be a symbolic link' >&2; exit 2; }
-staged=$name$ext
-if [ -e "$out/$staged" ]; then
-  cmp -s "$source" "$out/$staged" || { echo "staged binary conflicts with current build" >&2; exit 1; }
+staged=$staged_dir/$name$ext
+if [ -e "$staged" ]; then
+  cmp -s "$source" "$staged" || { echo "staged binary conflicts with current build" >&2; exit 1; }
 else
-  cp "$source" "$out/.$staged.next.$$"
-  chmod +x "$out/.$staged.next.$$"
-  mv "$out/.$staged.next.$$" "$out/$staged"
+  next=$staged_dir/.$name$ext.next.$$
+  cp "$source" "$next"
+  chmod +x "$next"
+  mv "$next" "$staged"
 fi
 generated=$out/.sidecar.json.next.$$
-sed "s#\"process\": \"dist/$name\"#\"process\": \"dist/$staged\"#" sidecar.json > "$generated"
+sed "s#\"process\": \"dist/$name\"#\"process\": \"dist/$name$ext\"#" sidecar.json > "$generated"
 if [ -e "$out/sidecar.json" ]; then
   cmp -s "$generated" "$out/sidecar.json" || { echo "staged manifest conflicts with source" >&2; exit 1; }
   find "$generated" -delete
 else
   mv "$generated" "$out/sidecar.json"
 fi
-echo "SIDECAR_STAGED target=$target output=$out/$staged"
+echo "SIDECAR_STAGED target=$target output=$staged"
