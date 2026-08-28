@@ -20,6 +20,12 @@ Blink scheduling is renderer policy, not parsed terminal state. This provider de
 animation interval. The common terminal Kit schedules frames only while the engine reports a
 visible blinking cursor; steady and hidden cursors wait for events without a timer.
 
+Alacritty's `Term::colors()` is the sole source for OSC 4/10/11/12 overrides. The adapter maps its
+optional indexed, foreground, background and cursor RGB values to `TerminalThemeOverrides`; it
+does not parse OSC. An absent value is a reset and lets the common renderer use the current host
+base theme. The common Kit applies the overrides, repaints every affected row and publishes the
+applied base, override and effective theme state.
+
 The contract-owned DECSCUSR and DEC private mode cases run in this repository through
 `tests/conformance.rs`. `make verify TARGET=aarch64-apple-darwin` verifies this provider's mapping
 and artifact. It does not inspect another provider implementation.
