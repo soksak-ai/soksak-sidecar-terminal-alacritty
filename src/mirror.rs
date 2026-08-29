@@ -1,7 +1,7 @@
 use crate::engine::Engine;
 use soksak_kit_sidecar_terminal::mirror::{
-    MirrorCapabilities, RecoveryMirror, SelectionRequest, SelectionSnapshot, TerminalCell,
-    EngineWheelInput, TerminalCursorAnimation, TerminalCursorStyle, TerminalFrame, TerminalModes,
+    EnginePointerInput, EngineWheelInput, MirrorCapabilities, RecoveryMirror, SelectionRequest,
+    SelectionSnapshot, TerminalCell, TerminalCursorAnimation, TerminalCursorStyle, TerminalFrame, TerminalModes,
     TerminalThemeOverrides,
 };
 
@@ -77,5 +77,8 @@ impl Mirror {
     }
     pub fn wheel_input(&mut self, input: EngineWheelInput) -> Result<Vec<u8>, String> {
         self.0.wheel_input(input)
+    }
+    pub fn pointer_input(&mut self, input: EnginePointerInput) -> Result<Vec<u8>, String> {
+        self.0.pointer_input(input)
     }
 }

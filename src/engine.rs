@@ -20,7 +20,7 @@ use alacritty_terminal::vte::ansi::{
 use soksak_kit_sidecar_terminal::mirror::TerminalEngine;
 pub use soksak_kit_sidecar_terminal::mirror::{
     TerminalCell as GridCell, TerminalColor as ColorSnap, TerminalCursorAnimation,
-    EngineSelectionPoint, EngineWheelInput, SelectionKind, SelectionModifiers, TerminalCursorShape,
+    EnginePointerInput, EngineSelectionPoint, EngineWheelInput, SelectionKind, SelectionModifiers, TerminalCursorShape,
     TerminalCursorStyle, TerminalModes as ModeSnap, TerminalRgb, TerminalThemeOverrides,
 };
 
@@ -118,6 +118,10 @@ impl Engine {
                 Ok(bytes)
             }
         }
+    }
+
+    pub fn pointer_input(&mut self, _input: EnginePointerInput) -> Result<Vec<u8>, String> {
+        Err("POINTER_INPUT_UNIMPLEMENTED".into())
     }
 
     fn mouse_report(&self, button: u8, input: &EngineWheelInput) -> Result<Vec<u8>, String> {
@@ -446,6 +450,9 @@ impl TerminalEngine for Engine {
     }
     fn wheel_input(&mut self, input: EngineWheelInput) -> Result<Vec<u8>, String> {
         Engine::wheel_input(self, input)
+    }
+    fn pointer_input(&mut self, input: EnginePointerInput) -> Result<Vec<u8>, String> {
+        Engine::pointer_input(self, input)
     }
     fn suppressed_replies(&self) -> u64 {
         self.captured_replies().len() as u64

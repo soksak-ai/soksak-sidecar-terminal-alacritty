@@ -65,6 +65,12 @@ impl soksak_kit_sidecar_terminal::TerminalStateMirror for Mirror {
     ) -> Result<Vec<u8>, String> {
         Mirror::wheel_input(self, input)
     }
+    fn pointer_input(
+        &mut self,
+        input: soksak_kit_sidecar_terminal::mirror::EnginePointerInput,
+    ) -> Result<Vec<u8>, String> {
+        Mirror::pointer_input(self, input)
+    }
     fn history_size(&self) -> usize {
         Mirror::history_size(self)
     }
