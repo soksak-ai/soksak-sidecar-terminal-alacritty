@@ -59,6 +59,12 @@ impl soksak_kit_sidecar_terminal::TerminalStateMirror for Mirror {
     fn selection_range(&self, line: i32) -> Option<(u16, u16)> {
         Mirror::selection_range(self, line)
     }
+    fn wheel_input(
+        &mut self,
+        input: soksak_kit_sidecar_terminal::mirror::EngineWheelInput,
+    ) -> Result<Vec<u8>, String> {
+        Mirror::wheel_input(self, input)
+    }
     fn history_size(&self) -> usize {
         Mirror::history_size(self)
     }

@@ -1,7 +1,7 @@
 use crate::engine::Engine;
 use soksak_kit_sidecar_terminal::mirror::{
     MirrorCapabilities, RecoveryMirror, SelectionRequest, SelectionSnapshot, TerminalCell,
-    TerminalCursorAnimation, TerminalCursorStyle, TerminalFrame, TerminalModes,
+    EngineWheelInput, TerminalCursorAnimation, TerminalCursorStyle, TerminalFrame, TerminalModes,
     TerminalThemeOverrides,
 };
 
@@ -74,5 +74,8 @@ impl Mirror {
     }
     pub fn selection_range(&self, line: i32) -> Option<(u16, u16)> {
         self.0.selection_range(line)
+    }
+    pub fn wheel_input(&mut self, input: EngineWheelInput) -> Result<Vec<u8>, String> {
+        self.0.wheel_input(input)
     }
 }

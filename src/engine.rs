@@ -20,7 +20,7 @@ use alacritty_terminal::vte::ansi::{
 use soksak_kit_sidecar_terminal::mirror::TerminalEngine;
 pub use soksak_kit_sidecar_terminal::mirror::{
     TerminalCell as GridCell, TerminalColor as ColorSnap, TerminalCursorAnimation,
-    EngineSelectionPoint, SelectionKind, SelectionModifiers, TerminalCursorShape,
+    EngineSelectionPoint, EngineWheelInput, SelectionKind, SelectionModifiers, TerminalCursorShape,
     TerminalCursorStyle, TerminalModes as ModeSnap, TerminalRgb, TerminalThemeOverrides,
 };
 
@@ -82,6 +82,10 @@ impl Engine {
         self.rows = rows;
         self.term
             .resize(TermSize::new(cols as usize, rows as usize));
+    }
+
+    pub fn wheel_input(&mut self, _input: EngineWheelInput) -> Result<Vec<u8>, String> {
+        Err("WHEEL_INPUT_UNIMPLEMENTED".into())
     }
 
     pub fn cols(&self) -> u16 {
@@ -376,6 +380,9 @@ impl TerminalEngine for Engine {
     }
     fn selection_range(&self, line: i32) -> Option<(u16, u16)> {
         Engine::selection_range(self, line)
+    }
+    fn wheel_input(&mut self, input: EngineWheelInput) -> Result<Vec<u8>, String> {
+        Engine::wheel_input(self, input)
     }
     fn suppressed_replies(&self) -> u64 {
         self.captured_replies().len() as u64
