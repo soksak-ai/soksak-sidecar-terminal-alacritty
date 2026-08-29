@@ -49,6 +49,16 @@ impl soksak_kit_sidecar_terminal::TerminalStateMirror for Mirror {
     fn line_cells(&self, line: i32) -> Vec<soksak_kit_sidecar_terminal::mirror::TerminalCell> {
         Mirror::line_cells(self, line)
     }
+    fn selection_command(
+        &mut self,
+        request: &soksak_kit_sidecar_terminal::mirror::SelectionRequest,
+        offset: usize,
+    ) -> Result<soksak_kit_sidecar_terminal::mirror::SelectionSnapshot, String> {
+        Mirror::selection_command(self, request, offset)
+    }
+    fn selection_range(&self, line: i32) -> Option<(u16, u16)> {
+        Mirror::selection_range(self, line)
+    }
     fn history_size(&self) -> usize {
         Mirror::history_size(self)
     }

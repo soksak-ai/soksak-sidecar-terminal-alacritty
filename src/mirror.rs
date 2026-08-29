@@ -1,7 +1,8 @@
 use crate::engine::Engine;
 use soksak_kit_sidecar_terminal::mirror::{
-    MirrorCapabilities, RecoveryMirror, TerminalCell, TerminalCursorAnimation, TerminalCursorStyle,
-    TerminalFrame, TerminalModes, TerminalThemeOverrides,
+    MirrorCapabilities, RecoveryMirror, SelectionRequest, SelectionSnapshot, TerminalCell,
+    TerminalCursorAnimation, TerminalCursorStyle, TerminalFrame, TerminalModes,
+    TerminalThemeOverrides,
 };
 
 pub struct Mirror(RecoveryMirror<Engine>);
@@ -63,5 +64,15 @@ impl Mirror {
     }
     pub fn frame(&self) -> TerminalFrame {
         self.0.frame()
+    }
+    pub fn selection_command(
+        &mut self,
+        request: &SelectionRequest,
+        offset: usize,
+    ) -> Result<SelectionSnapshot, String> {
+        self.0.selection_command(request, offset)
+    }
+    pub fn selection_range(&self, line: i32) -> Option<(u16, u16)> {
+        self.0.selection_range(line)
     }
 }

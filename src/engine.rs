@@ -9,7 +9,8 @@ use std::sync::{Arc, Mutex};
 
 use alacritty_terminal::event::{Event, EventListener};
 use alacritty_terminal::grid::Dimensions;
-use alacritty_terminal::index::{Column, Line};
+use alacritty_terminal::index::{Column, Line, Point, Side};
+use alacritty_terminal::selection::{Selection, SelectionType};
 use alacritty_terminal::term::cell::Flags;
 use alacritty_terminal::term::test::TermSize;
 use alacritty_terminal::term::{Config, Term, TermMode};
@@ -19,8 +20,8 @@ use alacritty_terminal::vte::ansi::{
 use soksak_kit_sidecar_terminal::mirror::TerminalEngine;
 pub use soksak_kit_sidecar_terminal::mirror::{
     TerminalCell as GridCell, TerminalColor as ColorSnap, TerminalCursorAnimation,
-    TerminalCursorShape, TerminalCursorStyle, TerminalModes as ModeSnap, TerminalRgb,
-    TerminalThemeOverrides,
+    EngineSelectionPoint, SelectionKind, SelectionModifiers, TerminalCursorShape,
+    TerminalCursorStyle, TerminalModes as ModeSnap, TerminalRgb, TerminalThemeOverrides,
 };
 
 /// 엔진이 유지하는 스크롤백 행 수. 바이트 충실 복원의 바닥 — 전체 의미 이력은
@@ -149,6 +150,80 @@ impl Engine {
     /// 현재 스크롤백(화면 위로 밀려난) 행 수.
     pub fn history_size(&self) -> usize {
         self.term.grid().history_size()
+    }
+
+    fn selection_point(&self, point: EngineSelectionPoint) -> (Point, Side) {
+        let top = -(self.term.grid().history_size() as i32);
+        let bottom = self.rows.saturating_sub(1) as i32;
+        let line = Line(point.line.clamp(top, bottom));
+        let column = Column(usize::from(point.col.min(self.cols.saturating_sub(1))));
+        let side = match point.side {
+            soksak_kit_sidecar_terminal::mirror::CellSide::Left => Side::Left,
+            soksak_kit_sidecar_terminal::mirror::CellSide::Right => Side::Right,
+        };
+        (Point::new(line, column), side)
+    }
+
+    pub fn selection_begin(
+        &mut self,
+        kind: SelectionKind,
+        point: EngineSelectionPoint,
+        _modifiers: SelectionModifiers,
+    ) -> Result<(), String> {
+        let (point, side) = self.selection_point(point);
+        if kind == SelectionKind::Extend {
+            let selection = self.term.selection.as_mut().ok_or("no selection to extend")?;
+            selection.update(point, side);
+            return Ok(());
+        }
+        let kind = match kind {
+            SelectionKind::Simple => SelectionType::Simple,
+            SelectionKind::Block => SelectionType::Block,
+            SelectionKind::Semantic => SelectionType::Semantic,
+            SelectionKind::Line => SelectionType::Lines,
+            SelectionKind::Extend => unreachable!(),
+        };
+        self.term.selection = Some(Selection::new(kind, point, side));
+        Ok(())
+    }
+
+    pub fn selection_update(
+        &mut self,
+        point: EngineSelectionPoint,
+        _modifiers: SelectionModifiers,
+    ) -> Result<(), String> {
+        let (point, side) = self.selection_point(point);
+        self.term.selection.as_mut().ok_or("no active selection")?.update(point, side);
+        Ok(())
+    }
+
+    pub fn selection_clear(&mut self) {
+        self.term.selection = None;
+    }
+
+    pub fn selection_text(&self) -> Option<String> {
+        self.term.selection.as_ref()?;
+        Some(self.term.selection_to_string().unwrap_or_default())
+    }
+
+    pub fn selection_range(&self, line: i32) -> Option<(u16, u16)> {
+        let range = self.term.selection.as_ref()?.to_range(&self.term)?;
+        let line = Line(line);
+        if line < range.start.line || line > range.end.line {
+            return None;
+        }
+        let last = self.cols.saturating_sub(1);
+        let start = if range.is_block || line == range.start.line {
+            u16::try_from(range.start.column.0).ok()?.min(last)
+        } else {
+            0
+        };
+        let end = if range.is_block || line == range.end.line {
+            u16::try_from(range.end.column.0).ok()?.min(last)
+        } else {
+            last
+        };
+        Some((start.min(end), start.max(end)))
     }
 
     pub fn modes(&self) -> ModeSnap {
@@ -281,6 +356,26 @@ impl TerminalEngine for Engine {
     }
     fn line_cells(&self, line: i32) -> Vec<GridCell> {
         Engine::line_cells(self, line)
+    }
+    fn selection_begin(
+        &mut self, kind: SelectionKind, point: EngineSelectionPoint,
+        modifiers: SelectionModifiers,
+    ) -> Result<(), String> {
+        Engine::selection_begin(self, kind, point, modifiers)
+    }
+    fn selection_update(
+        &mut self, point: EngineSelectionPoint, modifiers: SelectionModifiers,
+    ) -> Result<(), String> {
+        Engine::selection_update(self, point, modifiers)
+    }
+    fn selection_clear(&mut self) {
+        Engine::selection_clear(self)
+    }
+    fn selection_text(&self) -> Option<String> {
+        Engine::selection_text(self)
+    }
+    fn selection_range(&self, line: i32) -> Option<(u16, u16)> {
+        Engine::selection_range(self, line)
     }
     fn suppressed_replies(&self) -> u64 {
         self.captured_replies().len() as u64

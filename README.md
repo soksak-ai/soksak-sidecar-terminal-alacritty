@@ -5,6 +5,11 @@ contains the engine adapter, direct manifest, native build, conformance tests an
 matrix. Shared recovery, checkpoint and render-session behavior comes from the exact
 `soksak-kit-sidecar-terminal` Git revision declared in `Cargo.toml`.
 
+Native selection delegates to Alacritty's maintained `Selection` state and
+`Term::selection_to_string`. The adapter converts the common gesture point to Alacritty
+`Point`/`Side`, exposes Alacritty's inclusive row ranges to the shared painter, and returns the
+common versioned snapshot. It does not reconstruct selected text from exported cells.
+
 ## Verification
 
 ```sh
