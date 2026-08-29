@@ -84,8 +84,71 @@ impl Engine {
             .resize(TermSize::new(cols as usize, rows as usize));
     }
 
-    pub fn wheel_input(&mut self, _input: EngineWheelInput) -> Result<Vec<u8>, String> {
-        Err("WHEEL_INPUT_UNIMPLEMENTED".into())
+    pub fn wheel_input(&mut self, input: EngineWheelInput) -> Result<Vec<u8>, String> {
+        match input.route {
+            soksak_kit_sidecar_terminal::mirror::EngineWheelRoute::AlternateScroll => {
+                if !self.alt_active() || !self.modes().alternate_scroll {
+                    return Err("WHEEL_MODE_CHANGED: alternate scroll is not active".into());
+                }
+                let mut bytes = Vec::new();
+                let vertical = if input.vertical < 0 { b'A' } else { b'B' };
+                for _ in 0..input.vertical.unsigned_abs() {
+                    bytes.extend_from_slice(&[0x1b, b'O', vertical]);
+                }
+                let horizontal = if input.horizontal < 0 { b'D' } else { b'C' };
+                for _ in 0..input.horizontal.unsigned_abs() {
+                    bytes.extend_from_slice(&[0x1b, b'O', horizontal]);
+                }
+                Ok(bytes)
+            }
+            soksak_kit_sidecar_terminal::mirror::EngineWheelRoute::MouseReport => {
+                let modes = self.modes();
+                if !modes.mouse_click && !modes.mouse_drag && !modes.mouse_motion {
+                    return Err("WHEEL_MODE_CHANGED: mouse reporting is not active".into());
+                }
+                let mut bytes = Vec::new();
+                let vertical = if input.vertical < 0 { 64 } else { 65 };
+                for _ in 0..input.vertical.unsigned_abs() {
+                    bytes.extend(self.mouse_report(vertical, &input)?);
+                }
+                let horizontal = if input.horizontal < 0 { 66 } else { 67 };
+                for _ in 0..input.horizontal.unsigned_abs() {
+                    bytes.extend(self.mouse_report(horizontal, &input)?);
+                }
+                Ok(bytes)
+            }
+        }
+    }
+
+    fn mouse_report(&self, button: u8, input: &EngineWheelInput) -> Result<Vec<u8>, String> {
+        let modes = self.modes();
+        let modifiers = u8::from(input.modifiers.shift) * 4
+            + u8::from(input.modifiers.alt || input.modifiers.meta) * 8
+            + u8::from(input.modifiers.control) * 16;
+        let button = button + modifiers;
+        if modes.sgr_mouse {
+            return Ok(format!("\x1b[<{};{};{}M", button, input.col + 1, input.row + 1).into_bytes());
+        }
+        let limit = if modes.utf8_mouse { 2015 } else { 223 };
+        if usize::from(input.row) >= limit || usize::from(input.col) >= limit {
+            return Err(format!(
+                "WHEEL_POSITION_UNENCODABLE: row={} col={} limit={limit}",
+                input.row, input.col
+            ));
+        }
+        let mut bytes = vec![0x1b, b'[', b'M', 32 + button];
+        let mut position = |value: u16| {
+            let value = usize::from(value) + 33;
+            if modes.utf8_mouse && value >= 128 {
+                bytes.push((0xc0 + value / 64) as u8);
+                bytes.push((0x80 + (value & 63)) as u8);
+            } else {
+                bytes.push(value as u8);
+            }
+        };
+        position(input.col);
+        position(input.row);
+        Ok(bytes)
     }
 
     pub fn cols(&self) -> u16 {

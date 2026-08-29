@@ -10,6 +10,11 @@ Native selection delegates to Alacritty's maintained `Selection` state and
 `Point`/`Side`, exposes Alacritty's inclusive row ranges to the shared painter, and returns the
 common versioned snapshot. It does not reconstruct selected text from exported cells.
 
+Wheel input consumes the Kit's already normalized cell position, step counts, modifiers and route.
+This adapter encodes legacy, UTF-8 and SGR mouse reports from Alacritty's current terminal modes,
+including wheel direction and repeated steps. Alternate-scroll emits application cursor keys. It
+refuses a route whose engine mode changed and never writes the PTY itself.
+
 ## Verification
 
 ```sh
