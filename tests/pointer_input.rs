@@ -41,3 +41,15 @@ fn any_motion_reports_no_button_with_motion_bit() {
         b"\x1b[<35;2;3M"
     );
 }
+
+#[test]
+fn legacy_pointer_release_uses_button_three_and_keeps_modifiers() {
+    let mut engine = Engine::new(120, 40);
+    engine.feed(b"\x1b[?1000h");
+    let mut down = pointer(PointerPhase::Down, PointerButton::Right);
+    down.modifiers.control = true;
+    assert_eq!(engine.pointer_input(down).unwrap(), [0x1b, b'[', b'M', 50, 34, 35]);
+    let mut up = pointer(PointerPhase::Up, PointerButton::Right);
+    up.modifiers.control = true;
+    assert_eq!(engine.pointer_input(up).unwrap(), [0x1b, b'[', b'M', 51, 34, 35]);
+}

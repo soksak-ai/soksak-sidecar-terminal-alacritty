@@ -15,6 +15,11 @@ This adapter encodes legacy, UTF-8 and SGR mouse reports from Alacritty's curren
 including wheel direction and repeated steps. Alternate-scroll emits application cursor keys. It
 refuses a route whose engine mode changed and never writes the PTY itself.
 
+Pointer input uses the same mode state and coordinate encoders. Normal tracking emits press and
+release, button-event tracking adds held motion, and any-event tracking adds no-button motion.
+Legacy release uses button code three while SGR release keeps the physical button and terminates
+with `m`. Modifier bits and UTF-8 coordinates follow the same encoder as wheel reports.
+
 ## Verification
 
 ```sh
