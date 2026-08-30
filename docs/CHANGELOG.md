@@ -3,6 +3,14 @@
 This file records completed changes. Current behavior is defined by the documents in this
 directory and the terminal contract selected by `Cargo.toml`.
 
+## 2026-08-30
+
+- Release 0.0.42 publishes the expanded mouse-tracking mode surface.
+- DEC modes 9 and 1001 remain false because Alacritty does not retain either mode; no other
+  tracking state is used as an alias.
+- Wheel and pointer admission now follows the public `TerminalModes` rules, with owner tests for
+  the unsupported legacy modes and the distinct supported click mode.
+
 ## 2026-08-28
 
 - The sidecar now reads cursor shape and blink state from Alacritty's parsed terminal state.

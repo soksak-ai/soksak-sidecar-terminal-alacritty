@@ -18,7 +18,10 @@ refuses a route whose engine mode changed and never writes the PTY itself.
 Pointer input uses the same mode state and coordinate encoders. Normal tracking emits press and
 release, button-event tracking adds held motion, and any-event tracking adds no-button motion.
 Legacy release uses button code three while SGR release keeps the physical button and terminates
-with `m`. Modifier bits and UTF-8 coordinates follow the same encoder as wheel reports.
+with `m`. Modifier bits and UTF-8 coordinates follow the same encoder as wheel reports. Pointer
+and wheel admission uses the common `TerminalModes` rules. Alacritty retains modes 1000, 1002 and
+1003 as distinct engine facts; it does not retain DEC modes 9 or 1001, so those fields remain
+false instead of being inferred from another tracking mode.
 
 ## Verification
 
