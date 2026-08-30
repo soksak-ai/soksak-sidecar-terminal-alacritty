@@ -619,8 +619,8 @@ dependencies = [
 
 [[package]]
 name = "soksak-contract-surface"
-version = "0.0.8"
-source = "git+https://github.com/soksak-ai/soksak-contract-surface?rev=4bcf917cd104713bf934ee89afb81799466d2f3f#4bcf917cd104713bf934ee89afb81799466d2f3f"
+version = "0.0.9"
+source = "git+https://github.com/soksak-ai/soksak-contract-surface?rev=f3c3b22#f3c3b22f780850cb222e5eeb862eff59518766eb"
 dependencies = [
  "base64",
  "serde",
@@ -638,8 +638,8 @@ dependencies = [
 
 [[package]]
 name = "soksak-kit-sidecar-terminal"
-version = "0.0.31"
-source = "git+https://github.com/soksak-ai/soksak-kit-sidecar-terminal?rev=e840d6e942b4e9d07f6d78a0835ad9d256c7317b#e840d6e942b4e9d07f6d78a0835ad9d256c7317b"
+version = "0.0.32"
+source = "git+https://github.com/soksak-ai/soksak-kit-sidecar-terminal?rev=d1b6a0c#d1b6a0c23e66a17596b829cf87fb8649d89c2d55"
 dependencies = [
  "aes-gcm",
  "base64",
@@ -655,7 +655,7 @@ dependencies = [
 
 [[package]]
 name = "soksak-sidecar-terminal-alacritty"
-version = "0.0.40"
+version = "0.0.41"
 dependencies = [
  "alacritty_terminal",
  "base64",
