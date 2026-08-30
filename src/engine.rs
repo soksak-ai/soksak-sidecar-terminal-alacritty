@@ -516,4 +516,47 @@ mod tests {
         assert_eq!(reset.ansi[1], None);
         assert_eq!((reset.foreground, reset.background, reset.cursor), (None, None, None));
     }
+
+    #[test]
+    fn eighty_row_burst_retains_printable_history_and_viewport_cells() {
+        let mut engine = Engine::new(126, 30);
+        let mut bytes = Vec::new();
+        for row in 1..=80 {
+            bytes.extend_from_slice(format!("ROW{row:02}\r\n").as_bytes());
+        }
+        engine.feed(&bytes);
+        assert!(engine.history_size() >= 50);
+        let nonblank = (-10..20)
+            .flat_map(|line| engine.line_cells(line))
+            .filter(|cell| cell.ch != ' ')
+            .count();
+        assert!(nonblank > 100, "history viewport lost printable cells: {nonblank}");
+    }
+
+    #[test]
+    fn observed_zsh_prompt_bytes_leave_printable_cells() {
+        let mut engine = Engine::new(126, 30);
+        engine.feed(
+            concat!(
+                "%                                                                                                                            \r \r",
+                "\x1b]2;max@host:~/soksak/wails3beta/soksak-core\x07",
+                "\x1b]1;../soksak-core\x07",
+                "\x1b]7;file://host/Users/max/soksak/wails3beta/soksak-core\x1b\\\r",
+                "\x1b[01;32m?➡  \x1b[36msoksak-core\x1b[00m \x1b[?2004h\r\r",
+                "\x1b[01;32m?➡  \x1b[36msoksak-core\x1b[00m ",
+                "\x1b[01;34mgit:(\x1b[31mmain\x1b[34m)\x1b[00m ",
+            )
+            .as_bytes(),
+        );
+        engine.resize(1, 1);
+        engine.resize(126, 30);
+        let visible: String = (0..30)
+            .flat_map(|line| engine.line_cells(line))
+            .map(|cell| cell.ch)
+            .collect();
+        assert!(
+            visible.contains("soksak-core") && visible.contains("main"),
+            "observed prompt bytes produced no prompt: {visible:?}",
+        );
+    }
 }
