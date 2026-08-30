@@ -104,7 +104,7 @@ impl Engine {
             }
             soksak_kit_sidecar_terminal::mirror::EngineWheelRoute::MouseReport => {
                 let modes = self.modes();
-                if !modes.mouse_click && !modes.mouse_drag && !modes.mouse_motion {
+                if !modes.mouse_reporting() {
                     return Err("WHEEL_MODE_CHANGED: mouse reporting is not active".into());
                 }
                 let mut bytes = Vec::new();
@@ -127,14 +127,7 @@ impl Engine {
 
     pub fn pointer_input(&mut self, input: EnginePointerInput) -> Result<Vec<u8>, String> {
         let modes = self.modes();
-        let active = match input.phase {
-            PointerPhase::Down | PointerPhase::Up => {
-                modes.mouse_click || modes.mouse_drag || modes.mouse_motion
-            }
-            PointerPhase::Move if input.button == PointerButton::None => modes.mouse_motion,
-            PointerPhase::Move => modes.mouse_drag || modes.mouse_motion,
-        };
-        if !active {
+        if !modes.reports_pointer(input.phase, input.button) {
             return Err("POINTER_MODE_CHANGED: pointer phase is not reported".into());
         }
         let button = match input.button {
@@ -338,7 +331,11 @@ impl Engine {
             bracketed_paste: m.contains(TermMode::BRACKETED_PASTE),
             app_cursor: m.contains(TermMode::APP_CURSOR),
             app_keypad: m.contains(TermMode::APP_KEYPAD),
+            // Alacritty parses DEC modes 9 and 1001 as unknown and exposes no
+            // engine state for either tracking mode.
+            mouse_x10: false,
             mouse_click: m.contains(TermMode::MOUSE_REPORT_CLICK),
+            mouse_highlight: false,
             mouse_drag: m.contains(TermMode::MOUSE_DRAG),
             mouse_motion: m.contains(TermMode::MOUSE_MOTION),
             sgr_mouse: m.contains(TermMode::SGR_MOUSE),
