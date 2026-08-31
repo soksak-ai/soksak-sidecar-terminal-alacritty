@@ -5,6 +5,7 @@ directory and the terminal contract selected by `Cargo.toml`.
 
 ## 2026-08-31
 
+- Release 0.0.46 preserves combining codepoints in public surface reads through Kit 0.0.35.
 - Release 0.0.45 derives the Actions Node runtime from the verified SDK package metadata.
 - Release 0.0.44 uses the exact SDK 0.0.20 release closure for both local and public owner proofs.
 - Release 0.0.43 assigns the rewritten source commit a new immutable release identity; 0.0.42

@@ -5,7 +5,7 @@
 # unit's name only; the contract soksak-spec-sidecar-terminal is engine-neutral.
 [package]
 name = "soksak-sidecar-terminal-alacritty"
-version = "0.0.45"
+version = "0.0.46"
 edition = "2024"
 publish = false
 description = "Terminal-domain restore sidecar on the Alacritty VT engine: mirrors PTY session output into screen state (scrollback, alt-screen, private modes), serializes it into replayable paint for warm/cold restore, and checkpoints sealed plaintext through the core PTY daemon."
@@ -34,7 +34,7 @@ base64 = "0.22"
 # sockets on Unix and named pipes on Windows behind one API, inserting no framing of its
 # own, so the NDJSON + length-prefixed tee protocol is byte-for-byte unchanged.
 interprocess = "2"
-soksak-kit-sidecar-terminal = { git = "https://github.com/soksak-ai/soksak-kit-sidecar-terminal", rev = "20fb2d73d13e5bcde592380d3052c5d2204a592f", features = ["integration-tests"] }
+soksak-kit-sidecar-terminal = { git = "https://github.com/soksak-ai/soksak-kit-sidecar-terminal", rev = "60adad7a2bc39f327b1060fa0920edabac8ce3c9", features = ["integration-tests"] }
 
 # Redirect the survival service's own stderr to a home log so checkpoint failures are
 # visible (the plugin spawns it over a stdio Channel that drops stderr). The redirect is
