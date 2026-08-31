@@ -21,7 +21,7 @@ for (const value of ["set -eu", "realpathSync(tmpdir())", "$(CURDIR)/sidecar.jso
 if (!read("README.md").includes("make attest TARGET=") || !read("README.md").includes("OUT=/absolute/")) throw new Error("README must document owner attestation");
 if (!/^benchmark:/m.test(makefile) || /--test bench/.test(stage)) throw new Error("benchmark ownership is not separated from verification");
 if (/--test bench|performance budget/.test(read("scripts/gate.sh"))) throw new Error("owner verify still executes the product benchmark");
-for (const value of ["sdk_archive_url:", "sdk_archive_sha256:", "sdk_release_url:", "sdk_release_sha256:", "${{ inputs.sdk_archive_url }}", "${{ inputs.sdk_release_url }}", "$RUNNER_TEMP/soksak-sdk", "soksak-sdk prepare", ".dependencies/soksak-spec/release-template"]) requireText(value, "release-train input");
+for (const value of ["sdk_archive_url:", "sdk_archive_sha256:", "sdk_release_url:", "sdk_release_sha256:", "${{ inputs.sdk_archive_url }}", "${{ inputs.sdk_release_url }}", "$RUNNER_TEMP/soksak-sdk", "id: tooling", "node-version: ${{ steps.tooling.outputs.node }}", "soksak-sdk prepare", ".dependencies/soksak-spec/release-template"]) requireText(value, "release-train input");
 requireText('make verify TARGET="${{ matrix.target }}"', "owner Make verification");
 requireText('make stage TARGET="${{ matrix.target }}" STAGE=dist', "owner Make staging");
 requireText("release-template/sidecar/pack-target.mjs", "canonical target packer");
