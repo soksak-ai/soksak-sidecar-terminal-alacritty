@@ -1,6 +1,6 @@
 {
   "id": "soksak-sidecar-terminal-alacritty",
-  "version": "0.0.46",
+  "version": "0.0.47",
   "processRole": "sidecar-terminal-alacritty",
   "interface": [
     {
