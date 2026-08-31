@@ -3,6 +3,11 @@
 This file records completed changes. Current behavior is defined by the documents in this
 directory and the terminal contract selected by `Cargo.toml`.
 
+## 2026-08-31
+
+- Release 0.0.43 assigns the rewritten source commit a new immutable release identity; 0.0.42
+  remains bound to its original source commit and bytes.
+
 ## 2026-08-30
 
 - Release 0.0.42 publishes the expanded mouse-tracking mode surface.
