@@ -57,6 +57,10 @@ pub struct Engine {
 }
 
 impl Engine {
+    fn storage_cols(cols: u16) -> usize {
+        usize::from(cols.max(2))
+    }
+
     pub fn new(cols: u16, rows: u16) -> Self {
         let tap = ReplyTap::default();
         let replies = tap.0.clone();
@@ -64,7 +68,7 @@ impl Engine {
             scrolling_history: MIRROR_SCROLLBACK_LINES,
             ..Config::default()
         };
-        let term = Term::new(config, &TermSize::new(cols as usize, rows as usize), tap);
+        let term = Term::new(config, &TermSize::new(Self::storage_cols(cols), rows as usize), tap);
         Engine {
             term,
             parser: Processor::new(),
@@ -82,7 +86,7 @@ impl Engine {
         self.cols = cols;
         self.rows = rows;
         self.term
-            .resize(TermSize::new(cols as usize, rows as usize));
+            .resize(TermSize::new(Self::storage_cols(cols), rows as usize));
     }
 
     pub fn wheel_input(&mut self, input: EngineWheelInput) -> Result<Vec<u8>, String> {
@@ -207,7 +211,10 @@ impl Engine {
     /// 커서 위치(화면 기준 0-base row, col).
     pub fn cursor(&self) -> (usize, usize) {
         let p = self.term.grid().cursor.point;
-        (p.line.0.max(0) as usize, p.column.0)
+        (
+            p.line.0.max(0) as usize,
+            p.column.0.min(usize::from(self.cols.saturating_sub(1))),
+        )
     }
 
     pub fn cursor_style(&self) -> TerminalCursorStyle {
@@ -547,6 +554,10 @@ mod tests {
         );
         engine.resize(1, 1);
         engine.resize(126, 30);
+        for (cols, rows) in [(62, 30), (94, 30), (56, 30), (126, 30)] {
+            engine.feed(b"resize output\r\n");
+            engine.resize(cols, rows);
+        }
         let visible: String = (0..30)
             .flat_map(|line| engine.line_cells(line))
             .map(|cell| cell.ch)
@@ -555,5 +566,29 @@ mod tests {
             visible.contains("soksak-core") && visible.contains("main"),
             "observed prompt bytes produced no prompt: {visible:?}",
         );
+    }
+
+    #[test]
+    fn initial_one_cell_grid_accepts_prompt_before_first_host_resize() {
+        let mut engine = Engine::new(1, 1);
+        engine.feed(
+            concat!(
+                "%                                                                                                                            \r \r",
+                "\x1b]2;max@host:~/soksak/wails3beta/soksak-core\x07",
+                "\x1b]1;../soksak-core\x07",
+                "\x1b]7;file://host/Users/max/soksak/wails3beta/soksak-core\x1b\\\r",
+                "\x1b[01;32m?➡  \x1b[36msoksak-core\x1b[00m \x1b[?2004h\r\r",
+                "\x1b[01;32m?➡  \x1b[36msoksak-core\x1b[00m ",
+                "\x1b[01;34mgit:(\x1b[31mmain\x1b[34m)\x1b[00m ",
+            )
+            .as_bytes(),
+        );
+        engine.feed("🙂x".as_bytes());
+        engine.resize(126, 30);
+        let visible: String = (0..30)
+            .flat_map(|line| engine.line_cells(line))
+            .map(|cell| cell.ch)
+            .collect();
+        assert!(visible.contains("soksak-core") && visible.contains("main"));
     }
 }
