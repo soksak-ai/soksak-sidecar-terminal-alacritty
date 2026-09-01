@@ -1,8 +1,8 @@
 SHELL := /bin/sh
 STAGE ?= dist
-SDK_VERSION := 0.0.20
+SDK_VERSION := 0.0.21
 
-.PHONY: require-target preflight lock prepare build stage verify benchmark require-tooling require-out release attest
+.PHONY: require-target preflight lock prepare build stage verify benchmark require-tooling require-out require-store release attest
 
 require-target:
 	@test '$(origin TARGET)' = 'command line' && test -n '$(TARGET)' || { echo 'TARGET must be an explicit Make command-line variable' >&2; exit 2; }
@@ -45,7 +45,12 @@ require-out:
 	@case "$(OUT)" in /*) ;; *) echo 'OUT must be an absolute path' >&2; exit 64 ;; esac
 	@test "$(OUT)" != "$(CURDIR)" || { echo 'OUT must not replace the source repository' >&2; exit 64; }
 
-release: require-tooling require-out verify
+require-store:
+	@case "$(origin STORE)" in "command line") ;; *) echo 'STORE must be an absolute command-line path to the local release store' >&2; exit 64 ;; esac
+	@case "$(STORE)" in /*) ;; *) echo 'STORE must be an absolute path' >&2; exit 64 ;; esac
+	@test -d "$(STORE)" && test ! -L "$(STORE)" || { echo 'STORE is not a regular directory' >&2; exit 66; }
+
+release: require-tooling require-out require-store verify
 	@test -z "$$(git status --porcelain)" || { echo 'release source checkout must be clean' >&2; exit 65; }
 	@set -eu; tool="$$(command -v soksak-sdk)"; tooling_root="$$(cd "$$(dirname "$$tool")/.." && pwd -P)"; \
 		temp_root="$$(node -e 'const {realpathSync}=require("node:fs");const {tmpdir}=require("node:os");process.stdout.write(realpathSync(tmpdir()))')"; \
@@ -59,7 +64,7 @@ release: require-tooling require-out verify
 		version="$$(node -e 'const {readFileSync}=require("node:fs");process.stdout.write(JSON.parse(readFileSync(process.argv[1],"utf8")).version)' "$(CURDIR)/sidecar.json")"; \
 		archive="$$artifacts/soksak-sidecar-terminal-alacritty-$$version-$(TARGET).tar.gz"; \
 		soksak-sdk pack-target --root "$(CURDIR)" --spec-root "$$tooling_root/.dependencies/soksak-spec" --target '$(TARGET)' --source "$$package" --out "$$archive"; \
-		soksak-sdk package --root "$(CURDIR)" --spec-root "$$tooling_root/.dependencies/soksak-spec" --commit "$$(git rev-parse --verify HEAD)" --artifacts "$$artifacts" --target '$(TARGET)' --out "$(OUT)"
+		soksak-sdk package --root "$(CURDIR)" --spec-root "$$tooling_root/.dependencies/soksak-spec" --commit "$$(git rev-parse --verify HEAD)" --artifacts "$$artifacts" --target '$(TARGET)' --store "$(STORE)" --out "$(OUT)"
 
 attest: require-tooling require-out release
 	@tool="$$(command -v soksak-sdk)"; tooling_root="$$(cd "$$(dirname "$$tool")/.." && pwd -P)"; \
