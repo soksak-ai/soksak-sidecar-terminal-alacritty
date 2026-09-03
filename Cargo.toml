@@ -1,6 +1,6 @@
 # soksak-sidecar-terminal-alacritty — terminal-domain sidecar (Alacritty VT engine).
 # The core does not link this crate: it consumes the daemon's documented wire
-# (soksak-pty-proto framing, reimplemented here — [redacted] precedent) and
+# (soksak-pty-proto framing, reimplemented here) and
 # serves terminal plugins over a rendezvous socket. The engine name lives in this
 # unit's name only; the contract soksak-spec-sidecar-terminal is engine-neutral.
 [package]
