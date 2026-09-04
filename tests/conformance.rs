@@ -40,6 +40,11 @@ fn private_modes() {
 }
 
 #[test]
+fn mode_report_restores() {
+    contract::assert_mode_report_restores::<SidecarMirror>();
+}
+
+#[test]
 fn replay_guard() {
     contract::assert_conforms::<SidecarMirror>(Fixture::ReplayGuard);
 }
