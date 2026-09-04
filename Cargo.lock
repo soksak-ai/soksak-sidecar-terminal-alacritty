@@ -639,7 +639,7 @@ dependencies = [
 [[package]]
 name = "soksak-kit-sidecar-terminal"
 version = "0.0.35"
-source = "git+https://github.com/soksak-ai/soksak-kit-sidecar-terminal?rev=8d1ef287cfdfa9d2d09f5cba1946f33c67589163#8d1ef287cfdfa9d2d09f5cba1946f33c67589163"
+source = "git+https://github.com/soksak-ai/soksak-kit-sidecar-terminal?rev=1f777f876627ae9c587d78f34c29e436eb6c6886#1f777f876627ae9c587d78f34c29e436eb6c6886"
 dependencies = [
  "aes-gcm",
  "base64",
@@ -651,11 +651,12 @@ dependencies = [
  "sha2",
  "soksak-contract-control",
  "soksak-contract-surface",
+ "soksak-contract-terminal",
 ]
 
 [[package]]
 name = "soksak-sidecar-terminal-alacritty"
-version = "0.0.47"
+version = "0.0.48"
 dependencies = [
  "alacritty_terminal",
  "base64",
